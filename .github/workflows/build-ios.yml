@@ -29,41 +29,20 @@ jobs:
         run: cargo tauri ios init --ci
 
       - name: Configuration de la signature Ad-Hoc (Sideloadly / AltStore)
-        run: |
-          python3 -c '
-          import os, glob, re
-
-          # 1. Patch project.pbxproj directly
-          for pbx in glob.glob("gen/apple/**/*.pbxproj", recursive=True):
-              with open(pbx, "r") as f:
-                  txt = f.read()
-              
-              txt = txt.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
-              txt = txt.replace("ProvisioningStyle = Automatic;", "ProvisioningStyle = Manual;")
-              txt = re.sub(r"DevelopmentTeam = [^;]+;", "DevelopmentTeam = \"\";", txt)
-              txt = txt.replace("buildSettings = {", """buildSettings = {
-  				CODE_SIGN_STYLE = Manual;
-  				CODE_SIGN_IDENTITY = "-";
-  				AD_HOC_CODE_SIGNING_ALLOWED = YES;
-  				CODE_SIGNING_REQUIRED = NO;""")
-              with open(pbx, "w") as f:
-                  f.write(txt)
-              print(f"Patched PBX: {pbx}")
-          '
+        run: python3 scripts/patch_signing.py
 
       - name: Compilation iOS via Tauri CLI
-        run: |
-          cargo tauri ios build --ci --debug
+        run: cargo tauri ios build --ci --debug
 
       - name: Empaquetage du binaire IPA
         run: |
           echo "=== Recherche de l'application .app ==="
-          APP_DIR=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
+          APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
           if [ -z "$APP_DIR" ]; then
             APP_DIR=$(find . -name "*.app" -type d | head -n 1)
           fi
           if [ -z "$APP_DIR" ]; then
-            APP_DIR=$(find /Users/runner -name "*.app" -type d | grep -v "Xcode" | head -n 1)
+            APP_DIR=$(find /Users/runner -name "*.app" -type d | grep -v "Xcode.app" | head -n 1)
           fi
           
           echo "Application trouvée : $APP_DIR"
@@ -75,7 +54,7 @@ jobs:
             ls -lh CipherPlate-Lens.ipa
           else
             echo "ERREUR : Aucun dossier .app trouvé."
-            find ~/Library/Developer/Xcode/DerivedData -maxdepth 5 || true
+            find /Users/runner/Library/Developer/Xcode/DerivedData -maxdepth 5 || true
             exit 1
           fi
 
