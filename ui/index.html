@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CipherPlate Lens · Relais Optique Sécurisé</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jsqr.min.js"></script>
+    <script src="js/scanner.js"></script>
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-icon">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="brand-info">
+                <h1>CipherPlate Lens</h1>
+                <p>Relais Optique Sécurisé</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="btnToggleTheme" title="Changer le thème">
+                <svg class="icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Status Banner -->
+    <div class="pairing-banner" id="pairingBanner">
+        <div class="status-indicator" id="statusIndicator">
+            <span class="dot-pulse"></span>
+            <span id="terminalHostLabel">Non connecté</span>
+        </div>
+    </div>
+
+    <!-- Live Viewport Area -->
+    <main class="scanner-viewport">
+        <video id="cameraVideo" playsinline autoplay muted></video>
+
+        <!-- Reticle -->
+        <div class="reticle-container">
+            <div class="reticle-box" id="viewfinderReticle">
+                <div class="reticle-corner corner-tl"></div>
+                <div class="reticle-corner corner-tr"></div>
+                <div class="reticle-corner corner-bl"></div>
+                <div class="reticle-corner corner-br"></div>
+            </div>
+            <div class="viewfinder-instructions" id="instructionLabel">
+                Scanner le QR code d'appairage
+            </div>
+        </div>
+
+        <!-- Autoplay Tap Overlay -->
+        <div class="cam-click-overlay" id="camClickOverlay" style="display:none;">
+            <button class="apple-primary-btn" id="btnActivateCam">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Activer la caméra</span>
+            </button>
+        </div>
+
+        <!-- Simple Action Floating Bar -->
+        <div class="action-bar-container" id="actionBarContainer" style="display:none;">
+            <button class="action-btn-pill pairing" id="btnConfirmAction">
+                <span id="btnConfirmActionText">Appairer</span>
+            </button>
+            <button class="action-btn-dismiss" id="btnDismissDetection" title="Annuler">✕</button>
+        </div>
+
+        <!-- Floating Viewport Controls -->
+        <div class="viewport-floating-controls">
+            <button class="icon-btn" id="btnTorch" style="display:none;" title="Éclairage">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </button>
+            <button class="icon-btn" id="btnFlipCam" style="display:none;" title="Changer d'objectif">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M20 16v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5"/><path d="M4 8V3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5"/><polyline points="16 12 21 16 16 20"/><polyline points="8 12 3 8 8 4"/></svg>
+            </button>
+        </div>
+    </main>
+
+    <!-- Bottom Dock Navigation -->
+    <nav class="bottom-dock">
+        <button class="dock-btn active" id="dockBtnScan">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Viseur</span>
+        </button>
+        <button class="dock-btn" id="dockBtnLogs">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <span>Journal</span>
+        </button>
+        <button class="dock-btn" id="dockBtnReset" title="Déconnecter">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2.5 2v6h6"/><path d="M21.5 22v-6h-6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2L2.5 8"/><path d="M2 12.5a10 10 0 0 0 18.8 4.3l.7-.8"/></svg>
+            <span>Déconnecter</span>
+        </button>
+    </nav>
+
+    <!-- Success Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="success-check-badge">
+            <svg class="icon" style="width:36px;height:36px;stroke-width:2.5;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 id="feedbackTitle">Transmis au poste</h2>
+
+        <button class="apple-primary-btn" id="btnDismissFeedback" style="margin-top:24px;">
+            <span>Nouveau scan</span>
+        </button>
+    </div>
+
+    <!-- Modal Sheet: Logs -->
+    <div class="modal-sheet" id="modalLogs">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Journal d'Audit du Relais Optique</h3>
+                <button class="icon-btn" id="btnCloseLogs">✕</button>
+            </div>
+            <div class="log-table" id="logContainer">
+                <!-- Log entries will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

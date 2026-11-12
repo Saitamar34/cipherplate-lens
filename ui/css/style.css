@@ -1,0 +1,605 @@
+/* CipherPlate Lens · Relais Optique Sécurisé Mobile
+   Apple Executive Industrial Design System (Aligné à 100% avec CipherPlate Desktop) */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+:root {
+    /* Mode Nuit Apple (Système Gris Sobre) */
+    --bg-base: #1c1c1e;
+    --bg-card: #2c2c2e;
+    --bg-card-hover: #3a3a3c;
+    --bg-inset: #242426;
+    --bg-surface: #2c2c2e;
+    --border: rgba(255, 255, 255, 0.12);
+    --border-hover: rgba(255, 255, 255, 0.22);
+    --text-main: #f5f5f7;
+    --text-primary: #f5f5f7;
+    --text-muted: #98989d;
+    --text-secondary: #98989d;
+    --text-tertiary: #636366;
+    --primary: #0a84ff;
+    --primary-hover: #0071e3;
+    --accent: #0a84ff;
+    --success: #30d158;
+    --success-bg: rgba(48, 209, 88, 0.14);
+    --danger: #ff453a;
+    --danger-bg: rgba(255, 69, 58, 0.14);
+    --amber: #ffd60a;
+    --header-bg: rgba(28, 28, 30, 0.88);
+    --dock-bg: rgba(28, 28, 30, 0.88);
+    --overlay-bg: rgba(28, 28, 30, 0.94);
+    --instructions-bg: rgba(28, 28, 30, 0.88);
+    --instructions-color: #f5f5f7;
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-pill: 980px;
+}
+
+[data-theme="light"] {
+    /* Mode Jour Apple (Gris Doux & Nuances Chaudes Aligné Desktop) */
+    --bg-base: #f2f2f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8f8fa;
+    --bg-inset: #e5e5ea;
+    --bg-surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.16);
+    --text-main: #1c1c1e;
+    --text-primary: #1c1c1e;
+    --text-muted: #8e8e93;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #aeaeb2;
+    --primary: #0071e3;
+    --primary-hover: #0077ed;
+    --accent: #0071e3;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --amber: #d97706;
+    --header-bg: rgba(255, 255, 255, 0.88);
+    --dock-bg: rgba(255, 255, 255, 0.88);
+    --overlay-bg: rgba(242, 242, 247, 0.96);
+    --instructions-bg: rgba(255, 255, 255, 0.92);
+    --instructions-color: #1c1c1e;
+    --shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+body {
+    font-family: var(--font-stack);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Header Navigation Bar */
+.app-header {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(10, 132, 255, 0.25);
+}
+
+.brand-icon .icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+.brand-info h1 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.brand-info p {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.15s ease;
+}
+
+.icon-btn .icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+.icon-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+}
+
+.icon-btn:active {
+    transform: scale(0.94);
+}
+
+.icon-btn.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+/* Status Banner */
+.pairing-banner {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.status-indicator.connected {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.dot-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-indicator.connected .dot-pulse {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+/* Viewport Area */
+.scanner-viewport {
+    flex: 1;
+    position: relative;
+    background: #000000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#cameraVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Reticle & Overlay */
+.reticle-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.reticle-box {
+    width: 70vw;
+    height: 70vw;
+    max-width: 300px;
+    max-height: 300px;
+    position: relative;
+    border-radius: 20px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+/* Reticle Corners */
+.reticle-corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: rgba(255, 255, 255, 0.85);
+    border-style: solid;
+    transition: border-color 0.25s ease;
+}
+
+.corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 12px; }
+.corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 12px; }
+.corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 12px; }
+.corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 12px; }
+
+.reticle-box.detected-pairing {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65), 0 0 28px rgba(10, 132, 255, 0.5);
+    transform: scale(0.98);
+}
+
+.reticle-box.detected-pairing .reticle-corner {
+    border-color: var(--primary);
+}
+
+.reticle-box.detected-plate {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65), 0 0 28px rgba(48, 209, 88, 0.5);
+    transform: scale(0.98);
+}
+
+.reticle-box.detected-plate .reticle-corner {
+    border-color: var(--success);
+}
+
+.viewfinder-instructions {
+    margin-top: 24px;
+    background: var(--instructions-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--instructions-color);
+    pointer-events: auto;
+    text-align: center;
+    max-width: 85vw;
+    box-shadow: var(--shadow);
+    transition: all 0.25s ease;
+}
+
+/* Camera Overlay for User Interaction */
+.cam-click-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+    padding: 24px;
+    text-align: center;
+}
+
+.apple-primary-btn {
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: var(--radius-pill);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow);
+    transition: all 0.15s ease;
+}
+
+.apple-primary-btn:hover {
+    background: var(--primary-hover);
+}
+
+.apple-primary-btn:active {
+    transform: scale(0.96);
+}
+
+.apple-primary-btn .icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Floating Utility Controls (Torch & Flip) */
+.viewport-floating-controls {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 30;
+}
+
+/* Simple Action Floating Bar */
+.action-bar-container {
+    position: absolute;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 20px;
+    right: 20px;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: slideUpSpring 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.action-btn-pill {
+    flex: 1;
+    max-width: 320px;
+    padding: 16px 24px;
+    border-radius: var(--radius-pill);
+    border: none;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, filter 0.15s ease;
+    text-align: center;
+}
+
+.action-btn-pill.pairing {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.action-btn-pill.plate {
+    background: var(--success);
+    color: #ffffff;
+}
+
+.action-btn-pill:active {
+    transform: scale(0.97);
+    filter: brightness(0.95);
+}
+
+.action-btn-dismiss {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.15s ease;
+}
+
+.action-btn-dismiss:active {
+    transform: scale(0.94);
+}
+
+@keyframes slideUpSpring {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Bottom Action Bar */
+.bottom-dock {
+    background: var(--dock-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)) 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 40;
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.dock-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.dock-btn .icon {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+.dock-btn.active, .dock-btn:hover {
+    color: var(--primary);
+}
+
+/* Success Modal Overlay */
+.feedback-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 60;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.success-check-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--success);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(48, 209, 88, 0.35);
+}
+
+.feedback-overlay h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Drawer / Sheet Modal */
+.modal-sheet {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    padding: 20px 20px 32px 20px;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.log-table {
+    max-height: 260px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-base);
+    padding: 8px;
+    color: var(--text-primary);
+}
+
+.log-item {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-item.SUCCESS { color: var(--success); }
+.log-item.WARN { color: var(--amber); }
+.log-item.ERROR { color: var(--danger); }
+.log-item.INFO { color: var(--text-secondary); }
+
+.log-item .time {
+    color: var(--text-muted);
+    margin-right: 6px;
+}

@@ -1,0 +1,56 @@
+name: Build iOS Companion (CipherPlate Lens)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-13
+    timeout-minutes: 45
+
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: Configuration de Rust (Stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios, x86_64-apple-ios
+
+      - name: Installation de Tauri CLI
+        run: cargo install tauri-cli --version "^2.0" --locked
+
+      - name: Initialisation du projet Xcode iOS
+        run: cargo tauri ios init
+
+      - name: Compilation iOS & Création du package IPA
+        run: |
+          # Compilation debug pour installation sans compte payant (AltStore / Sideloadly)
+          cargo tauri ios build --ci --debug || true
+          
+          # Emballage au format standard .ipa pour installation directe
+          APP_DIR=$(find gen/apple/build -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find gen/apple -name "*.app" -type d | head -n 1)
+          fi
+          
+          if [ -n "$APP_DIR" ]; then
+            echo "Trouvé application : $APP_DIR"
+            mkdir -p Payload
+            cp -r "$APP_DIR" Payload/
+            zip -r CipherPlate-Lens.ipa Payload
+          else
+            echo "Recherche des builds..."
+          fi
+
+      - name: Archivage du fichier IPA pour iPhone
+        uses: actions/upload-artifact@v4
+        with:
+          name: CipherPlate-Lens-iOS
+          path: |
+            CipherPlate-Lens.ipa
+            gen/apple/build/**/*.ipa
+            gen/apple/build/**/*.app
+          if-no-files-found: warn

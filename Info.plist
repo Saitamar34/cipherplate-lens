@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSCameraUsageDescription</key>
+    <string>CipherPlate Lens requiert l'accès à la caméra pour la lecture optique des matrices physiques de secrets PRA.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>CipherPlate Lens nécessite l'accès au réseau local pour communiquer de façon sécurisée avec le Terminal PRA.</string>
+</dict>
+</plist>

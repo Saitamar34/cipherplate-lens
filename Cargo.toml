@@ -1,0 +1,28 @@
+[package]
+name = "cipherplate-optical-bridge"
+version = "1.0.0"
+edition = "2021"
+description = "CipherPlate Optical Bridge · Relais optique sécurisé mobile (iOS & Android) pour plaques PRA"
+authors = ["CipherPlate Security Team"]
+
+[lib]
+name = "cipherplate_optical_bridge_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "cipherplate-optical-bridge"
+path = "src/main.rs"
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
+aes-gcm = "0.10"
+hex = "0.4"
+rand = "0.8"
+sha2 = "0.10"
+chrono = { version = "0.4", features = ["serde"] }
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }

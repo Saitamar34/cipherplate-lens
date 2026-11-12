@@ -1,0 +1,5 @@
+/target
+gen/apple/build
+gen/android/build
+*.ipa
+Payload/
