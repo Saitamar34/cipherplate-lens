@@ -8,7 +8,7 @@ on:
 jobs:
   build-ios:
     runs-on: macos-15
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - name: Récupération du dépôt
@@ -19,23 +19,51 @@ jobs:
         with:
           targets: aarch64-apple-ios
 
-      - name: Installation de Tauri CLI v2
-        run: cargo install tauri-cli --version "^2.0" --locked
+      - name: Installation de cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Installation ultra-rapide de Tauri CLI v2
+        run: cargo binstall --no-confirm tauri-cli
 
       - name: Initialisation du projet iOS Xcode
         run: cargo tauri ios init --ci
 
+      - name: Configuration de la signature Ad-Hoc (Sideloadly / AltStore)
+        run: |
+          python3 -c '
+          import os, glob, re
+
+          # 1. Patch project.pbxproj directly
+          for pbx in glob.glob("gen/apple/**/*.pbxproj", recursive=True):
+              with open(pbx, "r") as f:
+                  txt = f.read()
+              
+              txt = txt.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
+              txt = txt.replace("ProvisioningStyle = Automatic;", "ProvisioningStyle = Manual;")
+              txt = re.sub(r"DevelopmentTeam = [^;]+;", "DevelopmentTeam = \"\";", txt)
+              txt = txt.replace("buildSettings = {", """buildSettings = {
+  				CODE_SIGN_STYLE = Manual;
+  				CODE_SIGN_IDENTITY = "-";
+  				AD_HOC_CODE_SIGNING_ALLOWED = YES;
+  				CODE_SIGNING_REQUIRED = NO;""")
+              with open(pbx, "w") as f:
+                  f.write(txt)
+              print(f"Patched PBX: {pbx}")
+          '
+
       - name: Compilation iOS via Tauri CLI
         run: |
-          # Construction de l'app iOS native en mode debug non signé (prêt pour Sideloadly / AltStore)
-          cargo tauri ios build --ci --debug -- CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO || true
+          cargo tauri ios build --ci --debug
 
       - name: Empaquetage du binaire IPA
         run: |
           echo "=== Recherche de l'application .app ==="
-          APP_DIR=$(find gen/apple -name "*.app" -type d | head -n 1)
+          APP_DIR=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
           if [ -z "$APP_DIR" ]; then
             APP_DIR=$(find . -name "*.app" -type d | head -n 1)
+          fi
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find /Users/runner -name "*.app" -type d | grep -v "Xcode" | head -n 1)
           fi
           
           echo "Application trouvée : $APP_DIR"
@@ -47,7 +75,7 @@ jobs:
             ls -lh CipherPlate-Lens.ipa
           else
             echo "ERREUR : Aucun dossier .app trouvé."
-            find gen/apple -maxdepth 4 || true
+            find ~/Library/Developer/Xcode/DerivedData -maxdepth 5 || true
             exit 1
           fi
 
