@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-13
+    runs-on: macos-15
     timeout-minutes: 45
 
     steps:
@@ -17,40 +17,52 @@ jobs:
       - name: Configuration de Rust (Stable)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-ios, x86_64-apple-ios
+          targets: aarch64-apple-ios
 
-      - name: Installation de Tauri CLI
+      - name: Installation de Tauri CLI v2
         run: cargo install tauri-cli --version "^2.0" --locked
 
-      - name: Initialisation du projet Xcode iOS
-        run: cargo tauri ios init
-
-      - name: Compilation iOS & Création du package IPA
+      - name: Initialisation du projet iOS Xcode (Non-interactif)
         run: |
-          # Compilation debug pour installation sans compte payant (AltStore / Sideloadly)
-          cargo tauri ios build --ci --debug || true
+          cargo tauri ios init --ci
+          ls -la gen/apple
+
+      - name: Compilation iOS & Création de l'application (.app)
+        run: |
+          PROJ=$(find gen/apple -name "*.xcodeproj" | head -n 1)
+          SCHEME=$(xcodebuild -list -project "$PROJ" | awk '/Schemes:/{flag=1; next} flag && NF {print $1; exit}')
+          echo "Projet Xcode : $PROJ, Schéma : $SCHEME"
           
-          # Emballage au format standard .ipa pour installation directe
-          APP_DIR=$(find gen/apple/build -name "*.app" -type d | head -n 1)
-          if [ -z "$APP_DIR" ]; then
-            APP_DIR=$(find gen/apple -name "*.app" -type d | head -n 1)
-          fi
-          
+          # Compilation non signée pour déploiement Sideloadly / AltStore
+          xcodebuild build \
+            -project "$PROJ" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ./derived_data \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Empaquetage du binaire IPA
+        run: |
+          APP_DIR=$(find ./derived_data -name "*.app" -type d | head -n 1)
+          echo "Application trouvée : $APP_DIR"
           if [ -n "$APP_DIR" ]; then
-            echo "Trouvé application : $APP_DIR"
             mkdir -p Payload
             cp -r "$APP_DIR" Payload/
             zip -r CipherPlate-Lens.ipa Payload
+            echo "IPA généré avec succès :"
+            ls -lh CipherPlate-Lens.ipa
           else
-            echo "Recherche des builds..."
+            echo "ERREUR: Aucun dossier .app trouvé dans derived_data"
+            exit 1
           fi
 
       - name: Archivage du fichier IPA pour iPhone
         uses: actions/upload-artifact@v4
         with:
           name: CipherPlate-Lens-iOS
-          path: |
-            CipherPlate-Lens.ipa
-            gen/apple/build/**/*.ipa
-            gen/apple/build/**/*.app
-          if-no-files-found: warn
+          path: CipherPlate-Lens.ipa
+          if-no-files-found: error
