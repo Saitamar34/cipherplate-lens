@@ -5,6 +5,28 @@ import re
 
 print("Patching Xcode project for ad-hoc / sideload signing...")
 
+# 1. Patch project.yml if present
+for yml in glob.glob("gen/apple/**/project.yml", recursive=True):
+    with open(yml, "r") as f:
+        content = f.read()
+    
+    # Add ad-hoc signing configuration to project.yml
+    if "CODE_SIGN_STYLE" not in content:
+        # append global settings override
+        patch = """
+settings:
+  base:
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    AD_HOC_CODE_SIGNING_ALLOWED: YES
+    CODE_SIGNING_REQUIRED: NO
+"""
+        content += patch
+        with open(yml, "w") as f:
+            f.write(content)
+        print(f"Patched YAML: {yml}")
+
+# 2. Patch project.pbxproj directly
 for pbx in glob.glob("gen/apple/**/*.pbxproj", recursive=True):
     with open(pbx, "r") as f:
         txt = f.read()

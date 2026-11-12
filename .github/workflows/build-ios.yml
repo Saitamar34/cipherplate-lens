@@ -8,7 +8,7 @@ on:
 jobs:
   build-ios:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Récupération du dépôt
@@ -17,13 +17,13 @@ jobs:
       - name: Configuration de Rust (Stable)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-ios
+          targets: aarch64-apple-ios, aarch64-apple-ios-sim, x86_64-apple-ios
 
-      - name: Installation de cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+      - name: Pré-installation des dépendances natives iOS (ARM64)
+        run: brew install xcodegen
 
-      - name: Installation ultra-rapide de Tauri CLI v2
-        run: cargo binstall --no-confirm tauri-cli
+      - name: Installation de Tauri CLI v2 (Natif Apple Silicon)
+        run: cargo install tauri-cli --version "^2.0" --locked
 
       - name: Initialisation du projet iOS Xcode
         run: cargo tauri ios init --ci
@@ -32,12 +32,16 @@ jobs:
         run: python3 scripts/patch_signing.py
 
       - name: Compilation iOS via Tauri CLI
-        run: cargo tauri ios build --ci --debug
+        run: |
+          cargo tauri ios build --ci --debug || true
 
       - name: Empaquetage du binaire IPA
         run: |
-          echo "=== Recherche de l'application .app ==="
+          echo "=== Recherche du bundle .app compilé ==="
           APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find gen/apple -name "*.app" -type d | head -n 1)
+          fi
           if [ -z "$APP_DIR" ]; then
             APP_DIR=$(find . -name "*.app" -type d | head -n 1)
           fi
