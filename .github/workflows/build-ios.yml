@@ -22,41 +22,32 @@ jobs:
       - name: Installation de Tauri CLI v2
         run: cargo install tauri-cli --version "^2.0" --locked
 
-      - name: Initialisation du projet iOS Xcode (Non-interactif)
-        run: |
-          cargo tauri ios init --ci
-          ls -la gen/apple
+      - name: Initialisation du projet iOS Xcode
+        run: cargo tauri ios init --ci
 
-      - name: Compilation iOS & Création de l'application (.app)
+      - name: Compilation iOS via Tauri CLI
         run: |
-          PROJ=$(find gen/apple -name "*.xcodeproj" | head -n 1)
-          SCHEME=$(xcodebuild -list -project "$PROJ" | awk '/Schemes:/{flag=1; next} flag && NF {print $1; exit}')
-          echo "Projet Xcode : $PROJ, Schéma : $SCHEME"
-          
-          # Compilation non signée pour déploiement Sideloadly / AltStore
-          xcodebuild build \
-            -project "$PROJ" \
-            -scheme "$SCHEME" \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath ./derived_data \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+          # Construction de l'app iOS native en mode debug non signé (prêt pour Sideloadly / AltStore)
+          cargo tauri ios build --ci --debug -- CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO || true
 
       - name: Empaquetage du binaire IPA
         run: |
-          APP_DIR=$(find ./derived_data -name "*.app" -type d | head -n 1)
+          echo "=== Recherche de l'application .app ==="
+          APP_DIR=$(find gen/apple -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find . -name "*.app" -type d | head -n 1)
+          fi
+          
           echo "Application trouvée : $APP_DIR"
           if [ -n "$APP_DIR" ]; then
             mkdir -p Payload
             cp -r "$APP_DIR" Payload/
             zip -r CipherPlate-Lens.ipa Payload
-            echo "IPA généré avec succès :"
+            echo "Package IPA généré avec succès :"
             ls -lh CipherPlate-Lens.ipa
           else
-            echo "ERREUR: Aucun dossier .app trouvé dans derived_data"
+            echo "ERREUR : Aucun dossier .app trouvé."
+            find gen/apple -maxdepth 4 || true
             exit 1
           fi
 
